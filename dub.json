@@ -1,0 +1,8 @@
+{
+    "name": "argparse",
+    "description": "Simple stupid command line parser for D",
+    "license": "MIT",
+    "authors": [ "マギルゥーベルベット" ],
+    "targetType": "staticLibrary",
+    "sourcePaths": [ "src" ]
+}
