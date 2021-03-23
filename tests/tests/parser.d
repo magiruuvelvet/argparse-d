@@ -271,4 +271,19 @@ class ParserTest
         assertEquals(parser.loseArguments(), ["abc"]);
         assertEquals(parser.remainingArguments(), []);
     }
+
+    @Test
+    @Tag("ParserTest.emptyStringArgument")
+    void emptyStringArgument()
+    {
+        ArgumentParser parser = ["app", "--option"];
+        parser.addArgument("", "option", "");
+        const auto res = parser.parse();
+
+        assertEquals(res, ArgumentParserResult.Success);
+        assertTrue(parser.exists("option"));
+        assertEquals(parser.get("option"), "");
+
+        assertEquals(parser.loseArguments(), []);
+    }
 }
