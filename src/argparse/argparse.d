@@ -27,7 +27,7 @@ public:
     /++
      + Returns a list of missing arguments once they were `parsed()`.
      +/
-    const(string[]) missingArguments() const @safe
+    const(string[]) missingArguments() const pure @safe
     {
         if (!this.parsed)
         {
@@ -35,6 +35,33 @@ public:
         }
 
         return this._missingArguments;
+    }
+
+    /++
+     + Returns a list of all lose arguments which didn't belong to an string option.
+     +/
+    const(string[]) loseArguments() const pure @safe
+    {
+        if (!this.parsed)
+        {
+            return [];
+        }
+
+        return this._loseArguments;
+    }
+
+    /++
+     + Returns a list of all remaining arguments which weren't parsed
+     + due to termination.
+     +/
+    const(string[]) remainingArguments() const pure @safe
+    {
+        if (!this.parsed)
+        {
+            return [];
+        }
+
+        return this._remainingArguments;
     }
 
     /++
@@ -82,6 +109,16 @@ public:
     }
 
     /++
+     + Enables command line parsing termination.
+     + Defaults to `--`.
+     +/
+    void setTerminator(in string terminator = "--") @safe
+    {
+        if (this.parsed) return;
+        this.terminator = terminator;
+    }
+
+    /++
      + Do the command line parsing. The status is returned
      + as an enum to check what happened.
      +
@@ -102,7 +139,8 @@ public:
             this.args,
             this.arguments,
             this.shortOptionPrefix,
-            this.longOptionPrefix);
+            this.longOptionPrefix,
+            this.terminator);
         this.parsed = true;
         this.parsingResult = result;
         return result;
@@ -247,9 +285,12 @@ private:
 
     string shortOptionPrefix = "-";
     string longOptionPrefix = "--";
+    string terminator = "";
 
 package:
     string[] _missingArguments = [];
+    string[] _loseArguments = [];
+    string[] _remainingArguments = [];
 
 private:
     bool addArgumentInternal(Argument argument) @safe

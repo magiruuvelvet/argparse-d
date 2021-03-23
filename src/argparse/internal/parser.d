@@ -122,7 +122,8 @@ public:
 ArgumentParserResult parse(
     scope ref ArgumentParser parserInstance,
     scope ref const(string[]) args, scope ref Argument[] registeredArguments,
-    in const(string) _shortOptionPrefix, in const(string) _longOptionPrefix) @trusted
+    in const(string) _shortOptionPrefix, in const(string) _longOptionPrefix,
+    in const(string) terminator) @trusted
 {
     alias Res = ArgumentParserResult;
 
@@ -145,6 +146,15 @@ ArgumentParserResult parse(
 
     for (auto i = 1; i < args.length; ++i)
     {
+        if (terminator.length > 0 && args[i] == terminator)
+        {
+            if ((i+1) < args.length)
+            {
+                parserInstance._remainingArguments = cast(string[]) args[i+1..$];
+            }
+            break;
+        }
+
         /// get next option or null
         const auto next_option = delegate string(){
             if ((i+1) >= args.length)
@@ -201,6 +211,11 @@ ArgumentParserResult parse(
                     }
                 }
             }
+        }
+        else if (type == OptionType.Value || type == OptionType.Unknown)
+        {
+            // found a lose argument
+            parserInstance._loseArguments ~= [name];
         }
     }
 
