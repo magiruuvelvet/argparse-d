@@ -42,6 +42,8 @@ class ParserTest
         assertEquals(res, ArgumentParserResult.Success);
         assertFalse(parser.exists("help"));
         assertTrue(parser.exists("version"));
+
+        assertEquals(parser.loseArguments(), []);
     }
 
     @Test
@@ -56,6 +58,8 @@ class ParserTest
         assertEquals(res, ArgumentParserResult.MissingArgument);
         assertFalse(parser.exists("required"));
         assertEquals(parser.missingArguments(), ["required"]);
+
+        assertEquals(parser.loseArguments(), []);
     }
 
     @Test
@@ -70,6 +74,8 @@ class ParserTest
         assertTrue(parser.exists("e"));
         assertTrue(parser.exists("enabled"));
         assertEquals(parser.get("enabled"), "true"); // boolean switches don't have values
+
+        assertEquals(parser.loseArguments(), ["value", "abc"]);
     }
 
     @Test
@@ -88,6 +94,8 @@ class ParserTest
 
         assertEquals(parser.get("value"), "abc");
         assertEquals(parser.get("nonexistend"), "");
+
+        assertEquals(parser.loseArguments(), []);
     }
 
     @Test
@@ -105,6 +113,8 @@ class ParserTest
         assertFalse(parser.exists("help"));
         assertEquals(parser.get("value"), "abc");
         assertEquals(parser.get("value2"), "xyz");
+
+        assertEquals(parser.loseArguments(), ["def"]);
     }
 
     @Test
@@ -125,6 +135,8 @@ class ParserTest
 
         value = parser.get!int("value");
         assertEquals(value, 10);
+
+        assertEquals(parser.loseArguments(), []);
     }
 
     @Test
@@ -149,6 +161,8 @@ class ParserTest
         auto value2 = parser.get!float("value", &ok);
         assertTrue(ok);
         assertGreaterThan(value2, 3.1); // don't do exact comparisson due to floating point madness
+
+        assertEquals(parser.loseArguments(), []);
     }
 
     @Test
@@ -167,5 +181,64 @@ class ParserTest
         assertTrue(parser.exists("コマンド"));
         assertEquals(parser.get("コマンド"), "表示");
         assertEquals(parser.get("コ"), "表示");
+
+        assertEquals(parser.loseArguments(), []);
+    }
+
+    @Test
+    @Tag("ParserTest.loseArguments")
+    void loseArguments()
+    {
+        ArgumentParser parser = ["app", "--value", "abc", "def", "--value2", "xyz", "lose1", "lose2", "--unused", "lose3"];
+        this.registerDefaultArguments(parser);
+        assertTrue(parser.addArgument("", "value", ""));
+        assertTrue(parser.addArgument("", "value2", ""));
+        assertFalse(parser.addArgument("", "value", ""));
+        const auto res = parser.parse();
+
+        assertEquals(res, ArgumentParserResult.Success);
+        assertFalse(parser.exists("help"));
+        assertEquals(parser.get("value"), "abc");
+        assertEquals(parser.get("value2"), "xyz");
+        assertFalse(parser.exists("unused"));
+
+        assertEquals(parser.loseArguments(), ["def", "lose1", "lose2", "lose3"]);
+    }
+
+    @Test
+    @Tag("ParserTest.termination")
+    void termination()
+    {
+        ArgumentParser parser = ["app", "--value", "abc", "--", "def", "--value2", "xyz", "lose1", "lose2", "--unused", "lose3"];
+        this.registerDefaultArguments(parser);
+        assertTrue(parser.addArgument("", "value", ""));
+        assertTrue(parser.addArgument("", "value2", ""));
+        assertFalse(parser.addArgument("", "value", ""));
+        parser.setTerminator();
+        const auto res = parser.parse();
+
+        assertEquals(res, ArgumentParserResult.Success);
+        assertFalse(parser.exists("help"));
+        assertEquals(parser.get("value"), "abc");
+        assertEquals(parser.get("value2"), "");
+        assertFalse(parser.exists("unused"));
+
+        assertEquals(parser.loseArguments(), []);
+        assertEquals(parser.remainingArguments(), ["def", "--value2", "xyz", "lose1", "lose2", "--unused", "lose3"]);
+    }
+
+    @Test
+    @Tag("ParserTest.termination2")
+    void termination2()
+    {
+        ArgumentParser parser = ["app", "--value", "abc", "--"];
+        this.registerDefaultArguments(parser);
+        parser.setTerminator();
+        const auto res = parser.parse();
+
+        assertEquals(res, ArgumentParserResult.Success);
+
+        assertEquals(parser.loseArguments(), ["abc"]);
+        assertEquals(parser.remainingArguments(), []);
     }
 }
