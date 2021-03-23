@@ -1389,7 +1389,6 @@ private bool intable(immutable ref .width_interval[] table, size_t table_length,
 	}
 
 ///
-extern (C)
 pure nothrow @safe @nogc @live
 public int wcwidth(uint ucs)
 
