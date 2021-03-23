@@ -20,6 +20,7 @@ and all of them are either `@safe` or `@trusted`.
  - doesn't inject any options by default (everything provided by the developer)
  - termination (disabled by default, default once activated: `--`)
  - lose values (there are no positional arguments)
+ - default values
 
 ## Usage
 
