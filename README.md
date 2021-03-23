@@ -18,6 +18,8 @@ and all of them are either `@safe` or `@trusted`.
  - i18n-friendly
  - very customizable and unobtrusive
  - doesn't inject any options by default (everything provided by the developer)
+ - termination (disabled by default, default once activated: `--`)
+ - lose values (there are no positional arguments)
 
 ## Usage
 
@@ -79,6 +81,11 @@ void main(string[] args)
    with their description and nothing else. Additional output when printing help
    is up to the developer. The indentation and spacing can be customized.
 
+ - `void ArgumentParser::setTerminator(string)`:\
+   Sets the parsing terminator at were to stop parsing arguments. By default no termination
+   is performed. Calling this function without arguments makes `--` the terminator.
+   Passing an empty string disables the terminator again.
+
  - `Result ArgumentParser::parse()`:\
    Does the parsing, once arguments were registered. The status is returned as enum.
    This function does nothing when there are no registered arguments or when `parse()`
@@ -87,6 +94,12 @@ void main(string[] args)
  - `string[] ArgumentParser::missingArguments()`:\
    Contains a list of all registered arguments which were missing during the parsing when they
    were marked as required.
+
+ - `string[] ArgumentParser::loseArguments()`:\
+   Contains a list of all unused and lose arguments which weren't matched during parsing.
+
+ - `string[] ArgumentParser::remainingArguments()`:\
+   Contains a list of all arguments after the terminator, excluding the terminator itself.
 
  - `bool ArgumentParser::exists(string)`:\
    Check if the argument with the name is present on the command line. Only registered arguments are checked.
@@ -102,7 +115,7 @@ void main(string[] args)
  - `--boolean`(Boolean) is present and true
  - `-a`(String) has value `"value"`
  - `-b`(String) has value `""` (empty string options are allowed)
- - unused values are discarded (`"value2"`)
+ - unused and lose values are stored in an array (`"value2"`)
 
 ## Why?
 
