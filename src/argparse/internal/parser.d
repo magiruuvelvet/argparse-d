@@ -222,11 +222,21 @@ ArgumentParserResult parse(
     // check if required arguments are missing
     try
     {
-        foreach (ref const argument; registeredArguments)
+        foreach (ref argument; registeredArguments)
         {
             if (argument.required && !argument.present)
             {
-                parserInstance._missingArguments ~= [argument.name];
+                // check if there is a default value to fall back
+                if (argument.hasDefaultValue())
+                {
+                    // make argument present even though it was omitted on the command line
+                    // but don't set a value on it, so the default value is taken instead
+                    argument.present = true;
+                }
+                else
+                {
+                    parserInstance._missingArguments ~= [argument.name];
+                }
             }
         }
     }

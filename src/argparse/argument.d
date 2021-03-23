@@ -13,7 +13,8 @@ public:
     alias String = Type.String;
     alias Boolean = Type.Boolean;
 
-    this(in string shortName, in string longName, in string description, in Type type = Type.String, in bool required = false)
+    this(in string shortName, in string longName, in string description,
+         in Type type = Type.String, in bool required = false)
     {
         this._shortName = shortName;
         this._longName = longName;
@@ -25,6 +26,13 @@ public:
         {
             this._value = "false";
         }
+    }
+
+    this(in string shortName, in string longName, in string description, in string defaultValue,
+         in Type type = Type.String, in bool required = false)
+    {
+        this(shortName, longName, description, type, required);
+        this._defaultValue = defaultValue;
     }
 
     // read-only properties
@@ -54,6 +62,11 @@ public:
         {
             return this._required;
         }
+
+        @property string defaultValue() const
+        {
+            return this._defaultValue;
+        }
     }
 
     // simple methods
@@ -75,6 +88,18 @@ public:
         bool hasLongName() const
         {
             return this.longName.length > 0;
+        }
+
+        /// does the argument has a default value
+        bool hasDefaultValue() const
+        {
+            return this._defaultValue !is null;
+        }
+
+        /// is a value set for the argument
+        bool hasValue() const
+        {
+            return this._value !is null;
         }
 
         /// returns the name of the option, longName is preferred, falls back to shortName
@@ -102,7 +127,14 @@ public:
             try
             {
                 if (ok) *ok = true;
-                return to!T(this._value);
+                if (!this.hasValue() && this.hasDefaultValue())
+                {
+                    return to!T(this._defaultValue);
+                }
+                else
+                {
+                    return to!T(this._value);
+                }
             }
             catch (Exception)
             {
@@ -112,19 +144,18 @@ public:
         }
     }
 
-    @property string value()
-    { return this._value; }
-    @property const(string) value() const
-    { return this._value; }
-    @property void value(in string val)
-    { this._value = val; }
+    mixin template make_property_method(T, string name, string attribute = "this._" ~ name)
+    {
+        pragma(inline)
+        {
+            mixin("@property T " ~ name ~ "() { return " ~ attribute ~ "; }");
+            mixin("@property const(T) " ~ name ~ "() const { return " ~ attribute ~ "; }");
+            mixin("@property void " ~ name ~ "(in T val) { " ~ attribute ~ " = val; }");
+        }
+    }
 
-    @property bool present()
-    { return this._present; }
-    @property const(bool) present() const
-    { return this._present; }
-    @property void present(in bool val)
-    { this._present = val; }
+    mixin make_property_method!(string, "value");
+    mixin make_property_method!(bool,   "present");
 
 private:
     @disable this();
@@ -137,6 +168,8 @@ private:
 
     string _value = null;     /// value once parsed or null if not present
     bool _present = false;    /// was the argument present during parsing
+
+    string _defaultValue = null; /// default value when `_value` is null
 
 package:
     /// reset argument to an unparsed state, called before registering in the parser
