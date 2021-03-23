@@ -132,3 +132,10 @@ Supported are:
 
  - boolean switches which are always true once present, there is **no** `-b=false` syntax, and
  - string switches which can take a value or not, if value is omitted an empty string is assumed.
+
+## Credits
+
+argparse has a renamed copy of [dokutoku/wcwidth-compat](https://github.com/dokutoku/wcwidth-compat)
+embedded for usage with the built-in help printer. The renaming was done to avoid eventual conflicts
+when your project already contains a version of wcwidth to avoid naming conflicts. All `extern (C)`
+attributes were removed too, to really avoid naming conflicts and linker errors all the way down.
