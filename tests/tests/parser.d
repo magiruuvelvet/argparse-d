@@ -63,6 +63,36 @@ class ParserTest
     }
 
     @Test
+    @Tag("ParserTest.requiredArgumentDefault")
+    void requiredArgumentDefault()
+    {
+        ArgumentParser parser = args1;
+        this.registerDefaultArguments(parser);
+        assertTrue(parser.addArgument("", "required", "", "default", Argument.String, true));
+        const auto res = parser.parse();
+
+        assertEquals(res, ArgumentParserResult.Success);
+        assertTrue(parser.exists("required"));
+        assertEquals(parser.missingArguments(), []);
+        assertEquals(parser.get("required"), "default");
+
+        assertEquals(parser.loseArguments(), []);
+
+
+        ArgumentParser parser2 = ["app", "--required", "another_value"];
+        this.registerDefaultArguments(parser2);
+        assertTrue(parser2.addArgument("", "required", "", "default", Argument.String, true));
+        const auto res2 = parser2.parse();
+
+        assertEquals(res2, ArgumentParserResult.Success);
+        assertTrue(parser2.exists("required"));
+        assertEquals(parser2.missingArguments(), []);
+        assertEquals(parser2.get("required"), "another_value");
+
+        assertEquals(parser2.loseArguments(), []);
+    }
+
+    @Test
     @Tag("ParserTest.booleanSwitch")
     void booleanSwitch()
     {
