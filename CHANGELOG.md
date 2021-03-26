@@ -1,5 +1,10 @@
 # Changelog
 
+## `1.1.1`
+
+ - fixed some typos in code documentation
+ - removed unused imports
+
 ## `1.1.0`
 
  - added support to obtain lose arguments rather then discarding them

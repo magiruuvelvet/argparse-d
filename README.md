@@ -2,8 +2,10 @@
 
 **Simple stupid command line parser for D**
 
+*This library has a C++ equivalent available with the exact same API: [argparse-cpp](https://github.com/magiruuvelvet/argparse-cpp)*
+
 This library is partially inspired by and older version of [argparse](https://github.com/jamolnng/argparse)
-which I use in my C++ command line applications. The parser only supports boolean and string options,
+which I used in my C++ command line applications. The parser only supports boolean and string options,
 while boolean options are always true when present. The public API is similar to the C++ library, but
 exceptions were replaced with status codes, so you can use it in exception-free code easily.
 
