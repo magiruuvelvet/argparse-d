@@ -4,7 +4,6 @@ import argparse.argparse;
 import argparse.argument;
 
 import std.string;
-import std.conv : to;
 
 nothrow:
 private:
@@ -133,7 +132,7 @@ ArgumentParserResult parse(
     // check for required arguments
     const bool requiredArguments = has_required_arguments(registeredArguments);
 
-    // args contain only the command and arguments are required
+    // args contains only the command and arguments are required
     if (args.length <= 1 && requiredArguments)
     {
         return Res.InsufficientArguments;
