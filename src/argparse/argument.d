@@ -78,19 +78,19 @@ public:
             return this.shortName.length > 0 || this.longName.length > 0;
         }
 
-        /// is a long name present
+        /// is a short name present
         bool hasShortName() const
         {
             return this.shortName.length > 0;
         }
 
-        /// is a short name present
+        /// is a long name present
         bool hasLongName() const
         {
             return this.longName.length > 0;
         }
 
-        /// does the argument has a default value
+        /// does the argument have a default value
         bool hasDefaultValue() const
         {
             return this._defaultValue !is null;
